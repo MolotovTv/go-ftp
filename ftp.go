@@ -76,6 +76,12 @@ func (f *FTP) connect() (conn ServerConnexion, err error) {
 	return conn, err
 }
 
+func (f *FTP) quit(conn ServerConnexion) {
+	if f.persistent == false {
+		conn.Quit()
+	}
+}
+
 // pconnect connects to the FTP and logs in
 func (f *FTP) pconnect() (err error) {
 	c, err := f.connect()
@@ -136,7 +142,7 @@ func (f *FTP) Download(ctx context.Context, src, dst string) (err error) {
 	if conn, err = f.Connect(); err != nil {
 		return
 	}
-	defer conn.Quit()
+	defer f.quit(conn)
 
 	// Check context error
 	if err = ctx.Err(); err != nil {
@@ -191,7 +197,7 @@ func (f *FTP) Remove(src string) (err error) {
 	if conn, err = f.Connect(); err != nil {
 		return
 	}
-	defer conn.Quit()
+	defer f.quit(conn)
 
 	// Remove
 	log.Debugf("Removing %s", src)
@@ -227,7 +233,7 @@ func (f *FTP) UploadReader(ctx context.Context, reader io.Reader, dst string) er
 	if err != nil {
 		return err
 	}
-	defer func() { _ = conn.Quit() }()
+	defer func() { f.quit(conn) }()
 
 	// Check context error
 	if err = ctx.Err(); err != nil {
@@ -252,7 +258,7 @@ func (f *FTP) FileSize(src string) (s int64, err error) {
 	if conn, err = f.Connect(); err != nil {
 		return
 	}
-	defer conn.Quit()
+	defer f.quit(conn)
 
 	// File size
 	return conn.FileSize(src)
@@ -281,7 +287,7 @@ func (f *FTP) List(sFolder string, aExtensionsAllowed []string, sPattern string)
 		log.Errorf("[FTP] error : %s", err.Error())
 		return aFilesRaw
 	}
-	defer conn.Quit()
+	defer f.quit(conn)
 	aFilesRaw, err = conn.List(sFolder)
 
 	if err != nil {
@@ -351,7 +357,7 @@ func (f *FTP) ListFolders(sFolder string) []*ftp.Entry {
 		log.Errorf("[FTP] error : %s", err.Error())
 		return aFilesRaw
 	}
-	defer conn.Quit()
+	defer f.quit(conn)
 	aFilesRaw, err = conn.List(sFolder)
 
 	if err != nil {
@@ -395,6 +401,7 @@ func (f *FTP) GetExtensionFile(oFile *ftp.Entry) string {
 
 //Exists do
 func (f *FTP) Exists(sFilePath string) (b bool, err error) {
+	fmt.Println(sFilePath)
 	// Log
 	l := fmt.Sprintf("FTP file exists of %s", sFilePath)
 	astilog.Debugf("[Start] %s", l)
@@ -407,7 +414,9 @@ func (f *FTP) Exists(sFilePath string) (b bool, err error) {
 	if conn, err = f.Connect(); err != nil {
 		return false, err
 	}
-	defer conn.Quit()
+	defer f.quit(conn)
+
+	fmt.Println(conn.FileSize(sFilePath))
 
 	if _, err := conn.FileSize(sFilePath); err != nil {
 		return false, nil
@@ -424,7 +433,7 @@ func (f *FTP) CreateDir(sPath string) (err error) {
 	if conn, err = f.Connect(); err != nil {
 		return err
 	}
-	defer conn.Quit()
+	defer f.quit(conn)
 
 	return conn.MakeDir(sPath)
 }
@@ -437,7 +446,7 @@ func (f *FTP) RemoveDir(sPath string) (err error) {
 	if conn, err = f.Connect(); err != nil {
 		return err
 	}
-	defer conn.Quit()
+	defer f.quit(conn)
 
 	return conn.RemoveDir(sPath)
 }
@@ -450,7 +459,7 @@ func (f *FTP) RemoveDirRecur(sPath string) (err error) {
 	if conn, err = f.Connect(); err != nil {
 		return err
 	}
-	defer conn.Quit()
+	defer f.quit(conn)
 
 	return conn.RemoveDirRecur(sPath)
 }
@@ -463,7 +472,7 @@ func (f *FTP) Rename(sSource string, sDestination string) (err error) {
 	if conn, err = f.Connect(); err != nil {
 		return err
 	}
-	defer conn.Quit()
+	defer f.quit(conn)
 
 	aDestination := strings.Split(sDestination, "/")
 	sDestinationFolder := strings.Join(aDestination[:len(aDestination)-1], "/")
@@ -510,7 +519,7 @@ func (f *FTP) CreateFile(sPath string, reader io.Reader) error {
 	if conn, err = f.Connect(); err != nil {
 		return err
 	}
-	defer conn.Quit()
+	defer f.quit(conn)
 
 	return conn.Stor(sPath, reader)
 
