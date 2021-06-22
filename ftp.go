@@ -91,7 +91,7 @@ func (f *FTP) pconnect() (err error) {
 func (f *FTP) Connect() (conn ServerConnexion, err error) {
 
 	if f.persistent {
-		if f.connexion != nil || f.nextConnexion.Unix() < time.Now().Unix() {
+		if f.connexion == nil || f.nextConnexion.Unix() < time.Now().Unix() {
 			err := f.pconnect()
 			if err != nil {
 				return f.connexion, err
