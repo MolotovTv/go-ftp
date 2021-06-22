@@ -71,7 +71,7 @@ func (f *FTP) connect() (conn ServerConnexion, err error) {
 
 	// Login
 	if err = conn.Login(f.Username, f.Password); err != nil {
-		conn.Quit()
+		f.quit(conn)
 	}
 	return conn, err
 }
@@ -79,6 +79,7 @@ func (f *FTP) connect() (conn ServerConnexion, err error) {
 func (f *FTP) quit(conn ServerConnexion) {
 	if f.persistent == false {
 		conn.Quit()
+		f.connexion = nil
 	}
 }
 
