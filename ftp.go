@@ -403,7 +403,6 @@ func (f *FTP) GetExtensionFile(oFile *ftp.Entry) string {
 
 //Exists do
 func (f *FTP) Exists(sFilePath string) (b bool, err error) {
-	fmt.Println(sFilePath)
 	// Log
 	l := fmt.Sprintf("FTP file exists of %s", sFilePath)
 	astilog.Debugf("[Start] %s", l)
@@ -417,8 +416,6 @@ func (f *FTP) Exists(sFilePath string) (b bool, err error) {
 		return false, err
 	}
 	defer f.quit(conn)
-
-	fmt.Println(conn.FileSize(sFilePath))
 
 	if _, err := conn.FileSize(sFilePath); err != nil {
 		return false, nil
