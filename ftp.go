@@ -71,7 +71,8 @@ func (f *FTP) connect() (conn ServerConnexion, err error) {
 
 	// Login
 	if err = conn.Login(f.Username, f.Password); err != nil {
-		f.quit(conn)
+		conn.Quit()
+		f.connexion = nil
 	}
 	return conn, err
 }
