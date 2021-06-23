@@ -15,12 +15,10 @@ var (
 
 // Configuration represents the FTP configuration
 type Configuration struct {
-	Addr       string        `json:"addr"`
-	Password   string        `json:"password"`
-	Timeout    time.Duration `toml:"timeout"`
-	Username   string        `json:"username"`
-	Persistent bool          `json:"persistent"`
-	TTL        time.Duration `json:"ttl"`
+	Addr     string        `json:"addr"`
+	Password string        `json:"password"`
+	Timeout  time.Duration `toml:"timeout"`
+	Username string        `json:"username"`
 }
 
 // FlagConfig generates a Configuration based on flags
